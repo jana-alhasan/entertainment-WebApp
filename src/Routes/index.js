@@ -15,7 +15,7 @@ import Footer from "../components/common/Footer";
 
 function Rotue() {
   return (
-    <Router basename="/Entertainment-web-app">
+    <Router basename="/entertainment-WebApp">
       <Navbar />    
       <Routes>
         <Route path="/" element={<Home />}/>
