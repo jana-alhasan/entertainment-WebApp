@@ -1,22 +1,31 @@
 import { useEffect, useState } from "react";
 
-// It attempts to retrieve the stored value associated with the given key from localStorage. If a value is found, it is parsed from JSON format and returned. If no value is found or if the stored value is null,
+function resolveInitialValue(initValue) {
+  return initValue instanceof Function ? initValue() : initValue;
+}
+
 function getSavedValue(key, initValue) {
   try {
-    const value = JSON.parse(localStorage.getItem(key));
-    if (value) return value;
-    if (initValue instanceof Function) return initValue();
-    return initValue;
-  } catch (error) {}
+    const storedValue = localStorage.getItem(key);
+
+    if (storedValue !== null) {
+      return JSON.parse(storedValue);
+    }
+
+    return resolveInitialValue(initValue);
+  } catch (error) {
+    return resolveInitialValue(initValue);
+  }
 }
+
 export default function useLocalStorage(key, initValue) {
-  const [value, setValue] = useState(() => {
-    return getSavedValue(key, initValue);
-  });
+  const [value, setValue] = useState(() => getSavedValue(key, initValue));
+
   useEffect(() => {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {}
-  }, [value]);
+  }, [key, value]);
+
   return [value, setValue];
 }

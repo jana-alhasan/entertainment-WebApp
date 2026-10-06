@@ -1,16 +1,8 @@
-import React from 'react'
-import { isBookMarked} from '../../utils/utils';
-import { API_KEY, DETAILS_API } from "../../utils/utils";
-import { useParams } from "react-router-dom";
-import { useFetch } from "../../hooks/useFetch";
-import Card from '../common/Card';
+import React from "react";
+import { isBookMarked } from "../../utils/utils";
+import Card from "../common/Card";
 
-
-const TVSection = ({ tvs, indicateBookedMarkedBtn, bookMarked , className}) => {
-    const { id } = useParams();
-    const { data: videos } = useFetch(
-      `${DETAILS_API}/movie/${id}/videos${API_KEY}`
-    );
+const TVSection = ({ tvs, indicateBookedMarkedBtn, bookMarked, className }) => {
   return (
     <div className={className}>
       {tvs.map((element) => {
@@ -22,7 +14,7 @@ const TVSection = ({ tvs, indicateBookedMarkedBtn, bookMarked , className}) => {
           first_air_date,
         } = element;
         const isBookedMarked = isBookMarked(id, bookMarked);
-        
+
         return (
           <Card
             element={element}
@@ -37,11 +29,11 @@ const TVSection = ({ tvs, indicateBookedMarkedBtn, bookMarked , className}) => {
             indicateBookedMarkedBtn={indicateBookedMarkedBtn}
             className="card"
             to={`/series/${id}`}
-          ></Card>
+          />
         );
       })}
     </div>
   );
 };
 
-export default TVSection
+export default TVSection;

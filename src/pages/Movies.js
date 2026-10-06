@@ -13,55 +13,54 @@ const Movies = () => {
   const [pageNumberSearch, setPageNumberSearch] = useState(1);
   const [displayedMovies, setDisplayedMovies] = useState([]);
   const { data: movies, loading: moviesLoading } = useFetch(
-    `${API_POPULAR_MOVIES} ${pageNumberMovies}`
+    `${API_POPULAR_MOVIES}${pageNumberMovies}`
   );
   const { bookMarkedMovies, indicateBookedMarkedBtn } =
     useContext(BookMarkedContext);
   const [searchInput, setSearchInput] = useState("");
-  const {
-    data: moviesSearch,
-    loading: searchLoading,
-    error: fetchError,
-  } = useFetch(
-    searchInput &&
-      `${SEARCH_MOVIES_API}${searchInput.toLowerCase()}&page=${pageNumberSearch}`
-  );
-  const [pageCount, setPageCount] = useState(movies && movies.total_pages);
+
+  const searchUrl = searchInput
+    ? `${SEARCH_MOVIES_API}${searchInput.toLowerCase()}`.replace(
+        "page=1",
+        `page=${pageNumberSearch}`
+      )
+    : null;
+
+  const { data: moviesSearch, loading: searchLoading } = useFetch(searchUrl);
+  const [pageCount, setPageCount] = useState(0);
 
   useEffect(() => {
-    if (movies) {
-      setDisplayedMovies(movies.results);
-      setPageCount(movies && movies.total_pages);
+    if (searchInput.trim()) {
+      if (moviesSearch) {
+        setDisplayedMovies(moviesSearch.results || []);
+        setPageCount(Number(moviesSearch.total_pages) || 0);
+      } else {
+        setDisplayedMovies([]);
+        setPageCount(0);
+      }
+      return;
     }
-  }, [movies]);
 
-  useEffect(() => {
-    searchMovie();
-  }, [moviesSearch, fetchError]);
+    setDisplayedMovies((movies && movies.results) || []);
+    setPageCount((movies && Number(movies.total_pages)) || 0);
+  }, [movies, moviesSearch, searchInput]);
 
   const onSearch = (event) => {
     setSearchInput(event.target.value);
+    setPageNumberSearch(1);
   };
 
   const handleSearchInput = deboune(onSearch, 500);
-  const searchMovie = () => {
-    if (searchInput.trim() && moviesSearch) {
-      setDisplayedMovies((moviesSearch && moviesSearch.results) || []);
-      setPageCount((moviesSearch && Number(moviesSearch.total_pages)) || 0);
+
+  const handlePageClick = ({ selected }) => {
+    if (searchInput) {
+      setPageNumberSearch(Number(selected) + 1);
     } else {
-      setDisplayedMovies(movies && movies.results);
-      setPageCount(movies && Number(movies.total_pages));
+      setPageNumberMovies(Number(selected) + 1);
     }
   };
 
-  const handlePageClick = ({ selected }) => {
-    if(searchInput && searchMovie){
-       setPageNumberSearch(Number(selected) + 1);
-    }else{
-      setPageNumberMovies(Number(selected) + 1);
-    }
-    
-  };
+  const isLoading = searchInput ? searchLoading : moviesLoading;
 
   return (
     <main>
@@ -69,7 +68,7 @@ const Movies = () => {
         <SearchBar
           placeHolder="Search for movies"
           handleSearchInput={handleSearchInput}
-        ></SearchBar>
+        />
         <section>
           {moviesSearch ? (
             <SectionTitle
@@ -79,23 +78,21 @@ const Movies = () => {
           ) : (
             <SectionTitle className="section-title" content="Movies" />
           )}
-          {moviesLoading ? (
+          {isLoading ? (
             <div className="loader-wrapper">
-              <Loader></Loader>
+              <Loader />
             </div>
           ) : (
-            displayedMovies && (
-              <MoviesSection
-                className="card-container card-container-margin"
-                movies={displayedMovies}
-                indicateBookedMarkedBtn={indicateBookedMarkedBtn}
-                bookMarked={bookMarkedMovies}
-              ></MoviesSection>
-            )
+            <MoviesSection
+              className="card-container card-container-margin"
+              movies={displayedMovies}
+              indicateBookedMarkedBtn={indicateBookedMarkedBtn}
+              bookMarked={bookMarkedMovies}
+            />
           )}
         </section>
         <Pagination
-          className={""}
+          className=""
           handlePageClick={handlePageClick}
           pageCount={pageCount}
         />

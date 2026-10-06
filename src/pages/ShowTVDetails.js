@@ -8,67 +8,61 @@ import { BookMarkedContext } from "../context/BookMarkedContext";
 import Loader from "../components/common/Loader";
 
 const ShowTVDetails = () => {
-      const { bookMarkedTVs, indicateBookedMarkedBtn } =
-        useContext(BookMarkedContext);
-    const { id } = useParams();
-    const { data: details, loading: detailsLoading } = useFetch(
-      `${DETAILS_API}/tv/${id}${API_KEY}`
-    );
-    const { data: videos } = useFetch(
-      `${DETAILS_API}/tv/${id}/videos${API_KEY}`
-    );
-   const { data: similarSeries ,loading:similarLoading} = useFetch(
-     `${DETAILS_API}/tv/${id}/similar${API_KEY}`
-   );
+  const { bookMarkedTVs, indicateBookedMarkedBtn } =
+    useContext(BookMarkedContext);
+  const { id } = useParams();
+  const { data: details } = useFetch(`${DETAILS_API}/tv/${id}${API_KEY}`);
+  const { data: videos } = useFetch(
+    `${DETAILS_API}/tv/${id}/videos${API_KEY}`
+  );
+  const { data: similarSeries, loading: similarLoading } = useFetch(
+    `${DETAILS_API}/tv/${id}/similar${API_KEY}`
+  );
 
-const isBookedMark = isBookMarked(details && details.id, bookMarkedTVs);
+  const isBookedMark = isBookMarked(details && details.id, bookMarkedTVs);
 
-   if(details != null ){
+  if (details != null) {
     return (
       <main>
         <div className="container">
-        <div className="video-responsive">
-          {videos && videos.results.length > 0 && (
-           
-            <YoutubeEmbed
-              embedId={videos && videos.results[0].key}
-            />
-          )}
+          <div className="video-responsive">
+            {videos?.results?.length > 0 && (
+              <YoutubeEmbed embedId={videos.results[0].key} />
+            )}
           </div>
           <section>
-            {details && (
-              <ShowDetailsSection
-                name={details.name}
-                year={details.first_air_date.substring(0, 4)}
-                genres={details.genres}
-                mediaType="tv"
-                element={details && details}
-                similar={(similarSeries && similarSeries.results) || []}
-                overview={details.overview}
-                episode_run_time={details.episode_run_time}
-                similarLoading={similarLoading}
-                indicateBookedMarkedBtn={indicateBookedMarkedBtn}
-                bookMarked={bookMarkedTVs}
-                isBookMarked={isBookedMark}
-                vote_average={details.vote_average}
-                vote_count={details.vote_count}
-              />
-            )}
+            <ShowDetailsSection
+              name={details.name}
+              year={details.first_air_date?.substring(0, 4)}
+              genres={details.genres}
+              mediaType="tv"
+              element={details}
+              poster_path={details.poster_path}
+              similar={(similarSeries && similarSeries.results) || []}
+              overview={details.overview}
+              episode_run_time={details.episode_run_time}
+              similarLoading={similarLoading}
+              indicateBookedMarkedBtn={indicateBookedMarkedBtn}
+              bookMarked={bookMarkedTVs}
+              isBookMarked={isBookedMark}
+              vote_average={details.vote_average}
+              vote_count={details.vote_count}
+            />
           </section>
         </div>
       </main>
     );
-   }else{
-    return (
-      <main>
-        <div className="container">
-          <div className="loader-wrapper">
-            <Loader></Loader>
-          </div>
+  }
+
+  return (
+    <main>
+      <div className="container">
+        <div className="loader-wrapper">
+          <Loader />
         </div>
-      </main>
-    );
-   }
+      </div>
+    </main>
+  );
 };
 
 export default ShowTVDetails;

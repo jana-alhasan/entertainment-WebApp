@@ -1,65 +1,62 @@
-import { createContext, useEffect } from "react";
+import { createContext } from "react";
 import React from "react";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { isBookMarked } from "../utils/utils";
 
 const BookMarkedContext = createContext({});
+
 const BookMarkedContextProvider = (props) => {
   const [bookMarkedMovies, setBookMarkedMovies] = useLocalStorage(
     "bookMarkedMovies",
     []
   );
-   const [bookMarkedTVs, setBookMarkedTVS] = useLocalStorage(
-     "bookMarkedTVS",
-     []
-   );
+  const [bookMarkedTVs, setBookMarkedTVS] = useLocalStorage(
+    "bookMarkedTVS",
+    []
+  );
 
-  const handleDeleteBookedMarked = (id,mediaType) => {
-     let bookMarks=[]
+  const handleDeleteBookedMarked = (id, mediaType) => {
     if (mediaType === "movie") {
-      bookMarks = bookMarkedMovies.filter((item) => {
-        return item.id !== id;
-      });
-      setBookMarkedMovies(bookMarks);
+      setBookMarkedMovies((currentItems) =>
+        currentItems.filter((item) => item.id !== id)
+      );
     } else {
-      bookMarks = bookMarkedTVs.filter((item) => {
-        return item.id !== id;
-      });
-      setBookMarkedTVS(bookMarks);
+      setBookMarkedTVS((currentItems) =>
+        currentItems.filter((item) => item.id !== id)
+      );
     }
-    
   };
 
-  const handleAddBookedMarked = (item,mediaType) => {
+  const handleAddBookedMarked = (item, mediaType) => {
     if (mediaType === "movie") {
-      setBookMarkedMovies((prevState) => [...prevState, item]);
+      setBookMarkedMovies((currentItems) => [...currentItems, item]);
     } else {
-      setBookMarkedTVS((prevState) => [...prevState, item]);
+      setBookMarkedTVS((currentItems) => [...currentItems, item]);
     }
-      
   };
 
   const indicateBookedMarkedBtn = (element, mediaType) => {
-    if (
-      isBookMarked(element.id, bookMarkedMovies) ||
-      isBookMarked(element.id, bookMarkedTVs)
-    ) {
+    const selectedBookmarks =
+      mediaType === "movie" ? bookMarkedMovies : bookMarkedTVs;
+
+    if (isBookMarked(element.id, selectedBookmarks)) {
       handleDeleteBookedMarked(element.id, mediaType);
     } else {
       handleAddBookedMarked(element, mediaType);
     }
   };
- 
+
   return (
     <BookMarkedContext.Provider
       value={{
         bookMarkedMovies,
         bookMarkedTVs,
-        indicateBookedMarkedBtn,   
+        indicateBookedMarkedBtn,
       }}
     >
       {props.children}
     </BookMarkedContext.Provider>
   );
 };
+
 export { BookMarkedContextProvider, BookMarkedContext };

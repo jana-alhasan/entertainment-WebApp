@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 
 export function useFetch(url) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState();
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!url) {
+      setLoading(false);
+      setData(null);
+      setError(null);
+      return;
+    }
+
     const fetchController = new AbortController();
     setError(null);
     setLoading(true);
@@ -14,25 +21,30 @@ export function useFetch(url) {
     const handleFetch = async () => {
       try {
         const response = await fetch(url, { signal: fetchController.signal });
+
         if (!response.ok) {
-          throw Error(" Something went wrong");
+          throw new Error("Something went wrong");
         }
-        const data = await response.json();
-         setData(data)
+
+        const responseData = await response.json();
+        setData(responseData);
         setLoading(false);
       } catch (err) {
         if (err.name === "AbortError") {
-          setError(null);
+          return;
         }
+
         setLoading(false);
         setError(err.message);
       }
     };
+
     handleFetch();
 
     return () => {
       fetchController.abort();
     };
   }, [url]);
+
   return { loading, data, error };
 }
