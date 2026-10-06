@@ -2,20 +2,24 @@ import React, { useContext, useState } from "react";
 import Image from "../common/Image";
 import { NavLink } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
-import ProfilePic from "./ProfilePic"
-import logo from "../../assets/logo.svg"
+import ProfilePic from "./ProfilePic";
+import logo from "../../assets/logo.svg";
 
 const Navbar = () => {
   const [active, setActive] = useState("home");
   const { theme, toggleTheme } = useContext(ThemeContext);
-  
+
   return (
     <nav>
       <div className="navbar">
         <div className="nav-links">
-          <a  className="nav-logo">
-          <Image src={logo}/>
-          </a>
+          <NavLink
+            to="/"
+            className="nav-logo"
+            onClick={() => setActive("home")}
+          >
+            <Image src={logo} />
+          </NavLink>
           <ul className="nav-items">
             <li className="nav-item">
               <NavLink
@@ -88,13 +92,13 @@ const Navbar = () => {
             </li>
           </ul>
         </div>
-        <ProfilePic/>
+        <ProfilePic />
         <div className="dark-mode">
           <input
             type="checkbox"
             id="dark-mode"
             onChange={toggleTheme}
-            checked={theme === "dark" ? true : false}
+            checked={theme === "dark"}
           />
           <label htmlFor="dark-mode">
             <i className="fas fa-moon"></i>

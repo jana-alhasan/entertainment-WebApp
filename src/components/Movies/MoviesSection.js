@@ -1,13 +1,13 @@
-import React from 'react';
-import Card from '../common/Card';
-import { isBookMarked } from '../../utils/utils';
-import { useParams } from 'react-router-dom';
-import { useFetch } from '../../hooks/useFetch';
-import { API_KEY, DETAILS_API } from '../../utils/utils';
+import React from "react";
+import Card from "../common/Card";
+import { isBookMarked } from "../../utils/utils";
 
-const MoviesSection = ({ movies, indicateBookedMarkedBtn, bookMarked, className }) => {
-
-
+const MoviesSection = ({
+  movies,
+  indicateBookedMarkedBtn,
+  bookMarked,
+  className,
+}) => {
   return (
     <div className={className}>
       {movies.map((element) => {
@@ -16,15 +16,16 @@ const MoviesSection = ({ movies, indicateBookedMarkedBtn, bookMarked, className 
 
         return (
           <Card
+            key={id}
+            {...rest}
             element={element}
+            id={id}
+            title={element.title || element.original_title}
+            media_type="movie"
             isBookedMarked={isBookedMarked}
             indicateBookedMarkedBtn={indicateBookedMarkedBtn}
             className="card"
             to={`/movies/${id}`}
-            {...rest}
-            key={id}
-            id={id}
-           
           />
         );
       })}

@@ -1,9 +1,9 @@
-import React, { useState , useEffect} from "react";
+import React, { useEffect, useState } from "react";
 import Image from "./Image";
 import { API_IMG } from "../../utils/utils";
 import FilmIcon from "../Movies/FilmIcon";
 import TVIcon from "../TV/TVIcon";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import VideoHover from "../Movies/VideoHover";
 import TVHover from "../TV/TVHover";
 import useDebounce from "../../hooks/useDebounce";
@@ -21,21 +21,20 @@ const Card = ({
   indicateBookedMarkedBtn,
   to,
   id,
-  
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [count, setCount] = useState(10);
   const [isMouseStillHovered, setIsMouseStillHovered] = useState(false);
-  const debouncedAlert = useDebounce(() => {
+  const imageSrc = API_IMG + (poster_path || backdrop_path);
+
+  const debouncedHover = useDebounce(() => {
     if (isMouseStillHovered) {
       setIsHovered(true);
     }
-  }, 2000, [count, isMouseStillHovered]);
+  }, 2000);
 
   const handleMouseEnter = () => {
-    setCount((c) => c + 1);
     setIsMouseStillHovered(true);
-    debouncedAlert();
+    debouncedHover();
   };
 
   const handleMouseLeave = () => {
@@ -49,34 +48,23 @@ const Card = ({
     }
   }, [isMouseStillHovered]);
 
-
- 
-
   return (
-    <Link 
-    to={to} >
-      
-    <div   
-     className= {className}
-     onMouseEnter={handleMouseEnter}
-     onMouseLeave={handleMouseLeave} 
-     
-    >
-      {isHovered ? 
-       (  
-      
-        media_type==='movie'?(
-          <VideoHover videoId={id} />
+    <Link to={to}>
+      <div
+        className={className}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {isHovered ? (
+          media_type === "movie" ? (
+            <VideoHover videoId={id} fallbackSrc={imageSrc} />
+          ) : (
+            <TVHover tvId={id} fallbackSrc={imageSrc} />
           )
-          :(
-            <TVHover TvId={id}/>
-          )
-         
-      ) : (
-       
-        <Image src={API_IMG + (poster_path || backdrop_path)} />
-   )}
-    
+        ) : (
+          <Image src={imageSrc} />
+        )}
+
         <div className="card-txtContainer">
           <p>
             {(release_date && release_date.substring(0, 4)) ||
@@ -110,9 +98,7 @@ const Card = ({
             <i className="fa-solid fa-play"></i>
           </button>
         </div>
-        
       </div>
-     
     </Link>
   );
 };
