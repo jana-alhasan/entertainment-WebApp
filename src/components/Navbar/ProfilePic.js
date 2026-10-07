@@ -1,40 +1,46 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../config/firebase-config";
-import profilePic from "../../assets/profilePhoto.png"
-
+import profilePic from "../../assets/profilePhoto.png";
 
 const ProfilePic = () => {
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    auth.signOut().then(() => {
-      navigate("/login");
-    });
-  };
+  const [user, setUser] = useState(auth.currentUser);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-  
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
     });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [navigate]);
+    return unsubscribe;
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error("Unable to sign out", error);
+    }
+  };
 
   return (
     <div>
-      {auth.currentUser ? (
-        // User is logged in
+      {user ? (
         <div>
-          <img onClick={handleLogout} className="avatar" src={profilePic} alt="Avatar" />
+          <img
+            onClick={handleLogout}
+            className="avatar"
+            src={profilePic}
+            alt="Log out"
+            title="Log out"
+          />
         </div>
       ) : (
-        // User is not logged in
         <div>
-          <Link to="/login">
-          <img onClick={handleLogout} className="avatar" src={profilePic} alt="Avatar" />
+          <Link to="/login" aria-label="Log in">
+            <img className="avatar" src={profilePic} alt="Log in" title="Log in" />
           </Link>
         </div>
       )}

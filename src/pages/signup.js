@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { auth }from "../components/config/firebase-config" ;
-import { useNavigate, Link } from 'react-router-dom';
-import '../styles/forms.css';
+import React, { useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+} from "firebase/auth";
+import { auth } from "../components/config/firebase-config";
+import { useNavigate, Link } from "react-router-dom";
+import "../styles/forms.css";
 
 function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const validatePassword = () => {
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return false;
     }
     return true;
@@ -21,28 +25,41 @@ function Signup() {
 
   const register = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
-    if (validatePassword()) {
+    if (!validatePassword()) {
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      let verificationMessage =
+        "A verification email has been sent. Please verify your email before logging in.";
+
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        if (user) {
-          await sendEmailVerification(auth.currentUser);
-          alert('A verification email has been sent. Please verify your email before logging in.');
-          setEmail('');
-          setPassword('');
-          setConfirmPassword('');
-          navigate("/login")
-        } else {
-          setError('Failed to create user');
-        }
-      } catch (error) {
-        setError(error.message);
+        await sendEmailVerification(user);
+      } catch (verificationError) {
+        verificationMessage =
+          "Your account was created, but we couldn't send the verification email right now. Please log in later to request a new verification link.";
+      } finally {
+        await signOut(auth);
       }
-    } else {
-      setError('Password validation failed');
+
+      alert(verificationMessage);
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      navigate("/login");
+    } catch (error) {
+      if (auth.currentUser) {
+        await signOut(auth).catch(() => {});
+      }
+      setError(error.message);
     }
   };
 
@@ -56,7 +73,7 @@ function Signup() {
       </svg>
       <div className="Card">
         <h1>Sign Up</h1>
-      
+
         <form onSubmit={register} name="registration_form">
           <input
             type="email"
