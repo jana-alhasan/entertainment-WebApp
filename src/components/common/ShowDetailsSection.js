@@ -1,19 +1,19 @@
-import React from 'react'
-import { API_IMG, toHoursAndMinutes } from '../../utils/utils';
-import CardSlider from './CardSlider';
-import Image from './Image';
-import Loader from './Loader';
-
+import React from "react";
+import { API_IMG, toHoursAndMinutes } from "../../utils/utils";
+import CardSlider from "./CardSlider";
+import Image from "./Image";
+import Loader from "./Loader";
 
 const ShowDetailsSection = (props) => {
   const timeObj = toHoursAndMinutes(props.runtime);
+
   return (
     <div className="details-wrapper">
       <div className="show-img-wrapper">
-        <Image src={API_IMG + props.poster_path}/>
+        <Image src={API_IMG + props.poster_path} />
         <button
-          onClick={(e) => {
-            e.preventDefault();
+          onClick={(event) => {
+            event.preventDefault();
             props.indicateBookedMarkedBtn(props.element, props.mediaType);
           }}
         >
@@ -40,11 +40,9 @@ const ShowDetailsSection = (props) => {
             </div>
           </div>
           <div className="genres">
-            {props.genres.map((genre) => {
-             console.log({genre})
-              return <span>{genre.name}</span>;
-            })}
-      
+            {(props.genres || []).map((genre) => (
+              <span key={genre.id || genre.name}>{genre.name}</span>
+            ))}
           </div>
           <p className="show-overview">{props.overview}</p>
         </div>
@@ -69,4 +67,4 @@ const ShowDetailsSection = (props) => {
   );
 };
 
-export default ShowDetailsSection
+export default ShowDetailsSection;

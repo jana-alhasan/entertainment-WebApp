@@ -1,4 +1,20 @@
-import { isBookMarked, toHoursAndMinutes } from "./utils";
+import {
+  isBookMarked,
+  normalizeSearchQuery,
+  toHoursAndMinutes,
+} from "./utils";
+
+describe("normalizeSearchQuery", () => {
+  test("trims, lowercases, and URL-encodes search text", () => {
+    expect(normalizeSearchQuery("  Spider Man & Friends  ")).toBe(
+      "spider%20man%20%26%20friends"
+    );
+  });
+
+  test("returns an empty string for empty input", () => {
+    expect(normalizeSearchQuery("   ")).toBe("");
+  });
+});
 
 describe("isBookMarked", () => {
   test("returns true when the exact media id is present", () => {
