@@ -1,10 +1,9 @@
 import "./App.css";
-import Rotue from "../src/Routes"
+import "./accessibility.css";
+import RoutesView from "../src/Routes";
 
 function App() {
-  return (
-   <Rotue/>
-  );
+  return <RoutesView />;
 }
 
 export default App;

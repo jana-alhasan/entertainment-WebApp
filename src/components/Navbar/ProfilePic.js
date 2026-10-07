@@ -26,23 +26,26 @@ const ProfilePic = () => {
   };
 
   return (
-    <div>
+    <div className="profile-control">
       {user ? (
-        <div>
-          <img
-            onClick={handleLogout}
-            className="avatar"
-            src={profilePic}
-            alt="Log out"
-            title="Log out"
-          />
-        </div>
+        <button
+          type="button"
+          className="profile-button"
+          onClick={handleLogout}
+          aria-label="Log out"
+          title="Log out"
+        >
+          <img className="avatar" src={profilePic} alt="" />
+        </button>
       ) : (
-        <div>
-          <Link to="/login" aria-label="Log in">
-            <img className="avatar" src={profilePic} alt="Log in" title="Log in" />
-          </Link>
-        </div>
+        <Link
+          to="/login"
+          className="profile-link"
+          aria-label="Log in"
+          title="Log in"
+        >
+          <img className="avatar" src={profilePic} alt="" />
+        </Link>
       )}
     </div>
   );
