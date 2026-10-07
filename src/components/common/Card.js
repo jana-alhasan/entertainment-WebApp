@@ -25,6 +25,7 @@ const Card = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isMouseStillHovered, setIsMouseStillHovered] = useState(false);
   const imageSrc = API_IMG + (poster_path || backdrop_path);
+  const itemTitle = title || "Entertainment title";
 
   const debouncedHover = useDebounce(() => {
     if (isMouseStillHovered) {
@@ -49,11 +50,15 @@ const Card = ({
   }, [isMouseStillHovered]);
 
   return (
-    <Link to={to}>
-      <div
-        className={className}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+    <div
+      className={className}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <Link
+        to={to}
+        className="card-details-link"
+        aria-label={`View details for ${itemTitle}`}
       >
         {isHovered ? (
           media_type === "movie" ? (
@@ -62,7 +67,7 @@ const Card = ({
             <TVHover tvId={id} fallbackSrc={imageSrc} />
           )
         ) : (
-          <Image src={imageSrc} />
+          <Image src={imageSrc} alt={`${itemTitle} poster`} />
         )}
 
         <div className="card-txtContainer">
@@ -70,36 +75,39 @@ const Card = ({
             {(release_date && release_date.substring(0, 4)) ||
               (first_air_date && first_air_date.substring(0, 4))}
           </p>
-          <span></span>
+          <span aria-hidden="true"></span>
           {media_type === "movie" ? <FilmIcon /> : <TVIcon />}
 
           <p>{media_type}</p>
-          <span></span>
+          <span aria-hidden="true"></span>
           <div className="rating">
-            <i className="fa fa-star"></i>
+            <i className="fa fa-star" aria-hidden="true"></i>
             <p>{element.vote_average}</p>
           </div>
         </div>
         <h3>{title}</h3>
-        <button
-          className="card-bookedMark"
-          onClick={(event) => {
-            event.preventDefault();
-            indicateBookedMarkedBtn(element, media_type);
-          }}
-        >
-          <i
-            className={`${isBookedMarked ? "fas" : "far"} fa-bookmark`}
-            aria-hidden="true"
-          ></i>
-        </button>
-        <div className="play-container">
-          <button>
+        <div className="play-container" aria-hidden="true">
+          <span className="play-indicator">
             <i className="fa-solid fa-play"></i>
-          </button>
+          </span>
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      <button
+        type="button"
+        className="card-bookedMark"
+        aria-label={`${isBookedMarked ? "Remove" : "Add"} ${itemTitle} ${
+          isBookedMarked ? "from" : "to"
+        } bookmarks`}
+        aria-pressed={Boolean(isBookedMarked)}
+        onClick={() => indicateBookedMarkedBtn(element, media_type)}
+      >
+        <i
+          className={`${isBookedMarked ? "fas" : "far"} fa-bookmark`}
+          aria-hidden="true"
+        ></i>
+      </button>
+    </div>
   );
 };
 
