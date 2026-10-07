@@ -2,7 +2,11 @@ import React, { Fragment, useContext, useEffect, useState } from "react";
 import SectionTitle from "../components/common/SectionTitle";
 import SearchBar from "../components/Search/SearchBar";
 import { useFetch } from "../hooks/useFetch";
-import { deboune, MULTI_SEARCH_API } from "../utils/utils";
+import {
+  deboune,
+  MULTI_SEARCH_API,
+  normalizeSearchQuery,
+} from "../utils/utils";
 import Loader from "../components/common/Loader";
 import { BookMarkedContext } from "../context/BookMarkedContext";
 import HomeSearchResult from "../components/Search/HomeSearchResult";
@@ -19,9 +23,10 @@ const Home = () => {
   const { bookMarkedMovies, bookMarkedTVs, indicateBookedMarkedBtn } =
     useContext(BookMarkedContext);
   const [searchInput, setSearchInput] = useState("");
+  const normalizedSearch = normalizeSearchQuery(searchInput);
   const { data: search, loading: searchLoading } = useFetch(
-    searchInput
-      ? `${MULTI_SEARCH_API}${searchInput.toLowerCase()}&page=${pageNumberSearch}`
+    normalizedSearch
+      ? `${MULTI_SEARCH_API}${normalizedSearch}&page=${pageNumberSearch}`
       : null
   );
   const [pageCount, setPageCount] = useState(0);
@@ -50,7 +55,7 @@ const Home = () => {
   const handleSearchInput = deboune(onSearch, 500);
 
   const handlePageClick = ({ selected }) => {
-    if (searchInput) {
+    if (searchInput.trim()) {
       setPageNumberSearch(Number(selected) + 1);
     } else {
       setPageNumberSearch(1);
@@ -64,7 +69,7 @@ const Home = () => {
           placeHolder="Search for movies or TV series"
           handleSearchInput={handleSearchInput}
         />
-        {!displayedSearch && !searchInput ? (
+        {!displayedSearch && !normalizedSearch ? (
           <Fragment>
             <Trending />
             <TopRatedTV />

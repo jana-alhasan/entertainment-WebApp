@@ -6,7 +6,12 @@ import MoviesSection from "../components/Movies/MoviesSection";
 import SearchBar from "../components/Search/SearchBar";
 import { BookMarkedContext } from "../context/BookMarkedContext";
 import { useFetch } from "../hooks/useFetch";
-import { API_POPULAR_MOVIES, deboune, SEARCH_MOVIES_API } from "../utils/utils";
+import {
+  API_POPULAR_MOVIES,
+  deboune,
+  normalizeSearchQuery,
+  SEARCH_MOVIES_API,
+} from "../utils/utils";
 
 const Movies = () => {
   const [pageNumberMovies, setPageNumberMovies] = useState(1);
@@ -18,9 +23,10 @@ const Movies = () => {
   const { bookMarkedMovies, indicateBookedMarkedBtn } =
     useContext(BookMarkedContext);
   const [searchInput, setSearchInput] = useState("");
+  const normalizedSearch = normalizeSearchQuery(searchInput);
 
-  const searchUrl = searchInput
-    ? `${SEARCH_MOVIES_API}${searchInput.toLowerCase()}`.replace(
+  const searchUrl = normalizedSearch
+    ? `${SEARCH_MOVIES_API}${normalizedSearch}`.replace(
         "page=1",
         `page=${pageNumberSearch}`
       )
@@ -53,14 +59,14 @@ const Movies = () => {
   const handleSearchInput = deboune(onSearch, 500);
 
   const handlePageClick = ({ selected }) => {
-    if (searchInput) {
+    if (searchInput.trim()) {
       setPageNumberSearch(Number(selected) + 1);
     } else {
       setPageNumberMovies(Number(selected) + 1);
     }
   };
 
-  const isLoading = searchInput ? searchLoading : moviesLoading;
+  const isLoading = searchInput.trim() ? searchLoading : moviesLoading;
 
   return (
     <main>

@@ -38,6 +38,7 @@ A React-based entertainment discovery application for browsing, searching, and b
 - Movie and TV bookmarks are handled independently so identical TMDB numeric IDs across media types do not conflict.
 - Fetch requests are aborted during cleanup and aborted requests do not surface as user-facing errors.
 - Search pagination updates the TMDB page request for both movie and TV results.
+- Search text is URL-encoded before it is sent to TMDB.
 - Trailer previews handle empty video results without crashing the card UI.
 - Firebase authentication listens to auth-state changes so the profile control updates after login and logout.
 - Unverified Firebase users are signed out even when a verification-email resend cannot be completed immediately.
@@ -48,8 +49,21 @@ The application includes routes for the home page, movies, TV series, bookmarks,
 
 ## Run locally
 
+Install dependencies:
+
 ```bash
 npm install
+```
+
+Copy `.env.example` to `.env` and add your own TMDB API key:
+
+```bash
+REACT_APP_TMDB_API_KEY=your_tmdb_api_key_here
+```
+
+Then start the app:
+
+```bash
 npm start
 ```
 
@@ -59,12 +73,16 @@ Create a production build with:
 npm run build
 ```
 
-## Validation
+The TMDB key is read from a Create React App environment variable instead of being hard-coded in tracked source. Because this is a browser application, values included at build time can still be visible to users of the deployed app; the environment variable improves configuration hygiene but is not secret storage.
 
-Recent hardening work was validated with a clean `npm ci` + production build and targeted headless-Chrome regression checks covering core search, details, bookmarks, pagination, trailer fallback, and theme persistence.
+## Validation and CI
 
-The Firebase flow was also validated end-to-end with a disposable test account: signup, unverified-login handling, real email verification, verified login, reactive profile state, and logout. The temporary Firebase user and mailbox were removed after testing.
+The repository has a permanent GitHub Actions CI workflow that runs on pull requests and pushes to `main`. It performs a clean dependency install, runs the focused Jest regression tests, and builds the production bundle.
+
+Recent hardening work was also validated with targeted headless-Chrome regression checks covering core search, details, bookmarks, pagination, trailer fallback, and theme persistence.
+
+The Firebase flow was validated end-to-end with a disposable test account: signup, unverified-login handling, real email verification, verified login, reactive profile state, and logout. The temporary Firebase user and mailbox were removed after testing.
 
 ## Project status
 
-This is an individual portfolio project. The current cleanup work focuses on reliability, accurate project documentation, and recruiter-facing proof without claiming features that are not implemented.
+This is an individual portfolio project. The current cleanup work focuses on reliability, accurate project documentation, configuration hygiene, and recruiter-facing proof without claiming features that are not implemented.

@@ -6,7 +6,12 @@ import SearchBar from "../components/Search/SearchBar";
 import TVSection from "../components/TV/TVSection";
 import { BookMarkedContext } from "../context/BookMarkedContext";
 import { useFetch } from "../hooks/useFetch";
-import { API_POPULAR_TV, deboune, SEARCH_TVS_API } from "../utils/utils";
+import {
+  API_POPULAR_TV,
+  deboune,
+  normalizeSearchQuery,
+  SEARCH_TVS_API,
+} from "../utils/utils";
 
 const Tv = () => {
   const [pageNumberTvs, setPageNumberTvs] = useState(1);
@@ -18,9 +23,10 @@ const Tv = () => {
   const { bookMarkedTVs, indicateBookedMarkedBtn } =
     useContext(BookMarkedContext);
   const [searchInput, setSearchInput] = useState("");
+  const normalizedSearch = normalizeSearchQuery(searchInput);
 
-  const searchUrl = searchInput
-    ? `${SEARCH_TVS_API}${searchInput.toLowerCase()}`.replace(
+  const searchUrl = normalizedSearch
+    ? `${SEARCH_TVS_API}${normalizedSearch}`.replace(
         "page=1",
         `page=${pageNumberSearch}`
       )
@@ -53,14 +59,14 @@ const Tv = () => {
   const handleSearchInput = deboune(onSearch, 500);
 
   const handlePageClick = ({ selected }) => {
-    if (searchInput) {
+    if (searchInput.trim()) {
       setPageNumberSearch(Number(selected) + 1);
     } else {
       setPageNumberTvs(Number(selected) + 1);
     }
   };
 
-  const isLoading = searchInput ? searchLoading : tvsLoading;
+  const isLoading = searchInput.trim() ? searchLoading : tvsLoading;
 
   return (
     <main>
